@@ -1,6 +1,5 @@
-
-
 'use strict';
+
 //npm installed modules
 const Hapi = require('hapi');
 const mongoose = require('mongoose');
@@ -52,13 +51,17 @@ server.register([
 		'options': options	
 	}
 	],function(err) {
-		
+		if(err){
+			console.log('Error while starting server ',err);
+			process.exit(1);
+		}else{
+			server.auth.strategy('jwt','jwt',{
+				key: app_constants.authkey,
+				verifyOptions: { algorithms: ['HS256'] }
+			});
+		}
 });
 
-console.log('++++++++++++++++++++++++++++++App Settings++++++++++++++++++++++++++++++');
-console.log(app_constants);
-console.log('++++++++++++++++++++++++++++++DB Settings++++++++++++++++++++++++++++++');
-console.log(db_constants);
 
 server.route(routes);
 
@@ -68,13 +71,23 @@ server.start(function(err) {
 		process.exit(1);
 	}
 	else{
-		console.log('Server Started at:', server.info.uri);
-	}
-});
-
-mongoose.connect('mongodb://'+db_constants.mongoHost+':'+db_constants.port+'/'+db_constants.database,[],function(err) {
+		console.log('++++++++++++++++++++++++++++++App Settings++++++++++++++++++++++++++++++');
+		console.log(app_constants);
+			
+		var dbAddress = 'mongodb://'+db_constants.mongoHost+':'+db_constants.port+'/'+db_constants.database;
+		
+		mongoose.connect(dbAddress,[],function(err) {
 			if(err)
 				console.log('Error while connecting to mongodb');
-			else
-				console.log('MongoDB connected Successfully on localhost:27017');
+			else{
+
+				process.env.app_constants = app_constants;	//setting the app constants in process.env object which is global
+				
+				console.log('++++++++++++++++++++++++++++++DB Settings++++++++++++++++++++++++++++++');
+				console.log(db_constants);
+			
+			}
+		});
+		console.log('Server Started at:', server.info.uri);
+	}
 });
