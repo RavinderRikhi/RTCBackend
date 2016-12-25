@@ -7,11 +7,13 @@ const mongoose = require('mongoose');
 const Inert = require('inert');
 const Vision = require('vision');
 const HapiSwagger = require('hapi-swagger');
+var hapiAuthJWT = require('hapi-auth-jwt2');
 
 //user defined modules
 const routes = require('./Routes');
 const env = require('./env.js');
 const Configs = require('./Configs');
+const Utils = require('./Utilities');
 const app_constants = (env.instance == "dev") ? Configs.app_constants.dev : Configs.app_constants.test;
 const db_constants = (env.instance == "dev") ? Configs.db_constants.dev : Configs.db_constants.test;
 
@@ -43,18 +45,22 @@ const options = {
 
 server.register([
 	Inert,
-	Vision,{
+	Vision,
+	hapiAuthJWT,
+	{
 		'register': HapiSwagger,
 		'options': options	
 	}
 	],function(err) {
-
+		
 });
 
 console.log('++++++++++++++++++++++++++++++App Settings++++++++++++++++++++++++++++++');
 console.log(app_constants);
 console.log('++++++++++++++++++++++++++++++DB Settings++++++++++++++++++++++++++++++');
 console.log(db_constants);
+
+server.route(routes);
 
 server.start(function(err) {
 	if(err){
@@ -65,9 +71,6 @@ server.start(function(err) {
 		console.log('Server Started at:', server.info.uri);
 	}
 });
-
-server.route(routes);
-
 
 mongoose.connect('mongodb://'+db_constants.mongoHost+':'+db_constants.port+'/'+db_constants.database,[],function(err) {
 			if(err)

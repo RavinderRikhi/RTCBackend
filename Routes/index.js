@@ -1,4 +1,6 @@
 
 'use strict';
 
-module.exports = [].concat();
+var users = require('./users');
+
+module.exports = [].concat(users);
