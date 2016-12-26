@@ -57,13 +57,16 @@ server.register([
 		}else{
 			server.auth.strategy('jwt','jwt',{
 				key: app_constants.authkey,
+				validateFunc:function (decoded, request, callback) {
+ 
+				    console.log(decode);
+				    callback(null,true);
+				},
 				verifyOptions: { algorithms: ['HS256'] }
 			});
+			server.route(routes);
 		}
 });
-
-
-server.route(routes);
 
 server.start(function(err) {
 	if(err){

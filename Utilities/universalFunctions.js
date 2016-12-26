@@ -36,5 +36,12 @@ module.exports = {
 		
 		return jwt.sign({id: user._id, username: usernames, scope : scopes},process.env.app_constants.authkey,{ algorithm: 'HS256', expiresIn: "4h" });
 	
+	},
+
+	//function to verify the unique user using the email/facebook_id/google_id and Password
+	verifyUniqueUser: function(requset,callback) {
+
+		console.log('Utilities: createToken function called');
+		
 	}
 };
